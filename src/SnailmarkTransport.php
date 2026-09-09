@@ -157,8 +157,9 @@ class SnailmarkTransport implements TransportInterface
                 continue;
             }
 
+            // Symfony keys the header map in lowercase; ship the header's own casing.
             $payload['Headers'][] = [
-                'Name' => $name,
+                'Name' => $header->getName(),
                 'Value' => $header->getBodyAsString(),
             ];
         }

@@ -12,6 +12,8 @@ class SnailmarkServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'snailmark');
+
         $this->app['mail.manager']->extend('snailmark', function (array $config) {
             $configuration = $this->app->make('config');
 

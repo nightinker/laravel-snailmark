@@ -72,10 +72,48 @@ Mail::to($user)->send(
 );
 ```
 
+### Sending a Snailmark template
+
+Render the email from a template stored in Snailmark instead of a Blade view. From a
+mailable:
+
+```php
+use Snailmark\Mail\TemplatedMailable;
+
+Mail::to($user)->send(
+    (new TemplatedMailable)
+        ->alias('LB_FORM_READY')            // or ->identifier($templateId)
+        ->include(['name' => $user->first_name, 'document' => $document->name])
+);
+```
+
+From a notification, return a `TemplatedMailMessage` from `toMail()`:
+
+```php
+use Snailmark\Mail\TemplatedMailMessage;
+
+public function toMail($notifiable): TemplatedMailMessage
+{
+    return (new TemplatedMailMessage)
+        ->alias('LB_MAGIC_LOGIN')
+        ->include(['action_url' => $this->url, 'expires_in' => 15]);
+}
+```
+
+Both post to `POST /api/email/withTemplate` with `TemplateAlias`/`TemplateId` and
+`TemplateModel`; the subject and body come from the template.
+
 ## Notes
 
-- The transport sends the full message envelope — Cc, Bcc, Reply-To, attachments, tags, metadata, and custom headers.
-- Templated sends: encode `{"alias": "...", "model": {...}}` as the message HTML body to hit `POST /api/email/withTemplate`.
+- The transport sends the full message envelope — Cc, Bcc, Reply-To, attachments (inline ones keep their Content-ID), tags, metadata, and custom headers.
+- Snailmark also accepts Postmark's `X-Postmark-Server-Token` header and paths, so an app already on `coconutcraig/laravel-postmark` can switch by swapping the driver.
+
+## Testing
+
+```bash
+composer install
+vendor/bin/phpunit
+```
 
 ## License
 
